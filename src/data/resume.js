@@ -77,7 +77,7 @@ export const resume = {
       color: '#2a6e3f',
       cover: 'forest',
       coverImage: '/images/slxws-cover.jpg',
-      // detailVideo: '/videos/slxws-video.mp4', // 原 42MB 视频已移出（超 Cloudflare 25MB 上限），上线前若补回请取消注释
+      detailVideo: '/videos/slxws-video.mp4', // 已压缩至 18MB（< Cloudflare 25MB 上限）
     },
     {
       id: 'ue5-terrain',
