@@ -1,0 +1,12 @@
+# 依赖（安装时自动生成，不入库）
+node_modules
+
+# 构建产物（npm run build 自动生成，不入库）
+dist
+
+# 压缩包等临时文件
+*.zip
+
+# 系统文件
+.DS_Store
+Thumbs.db

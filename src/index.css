@@ -1,0 +1,326 @@
+/* ===========================================
+   Global Design System
+   Dark · Premium · Restrained · Tech-feel
+   =========================================== */
+
+:root {
+  /* Color tokens */
+  --bg-primary: #0a0f0c;
+  --bg-secondary: #0c100e;
+  --bg-tertiary: #101512;
+  --bg-elevated: #141a17;
+
+  --border-subtle: rgba(61, 220, 151, 0.08);
+  --border-medium: rgba(61, 220, 151, 0.14);
+  --border-strong: rgba(61, 220, 151, 0.22);
+
+  --text-primary: #f5f5f5;
+  --text-secondary: #a0b8ad;
+  --text-muted: #5f7068;
+  --text-faint: #384038;
+
+  --accent: #3ddc97;
+  --accent-soft: rgba(61, 220, 151, 0.15);
+  --accent-glow: rgba(61, 220, 151, 0.4);
+
+  /* Layout */
+  --max-width: 1700px;
+  --gutter: 64px;
+  --gutter-mobile: 24px;
+  --section-pad: 140px;
+  --section-pad-mobile: 80px;
+
+  /* Type scale */
+  --display-1: clamp(72px, 9vw, 160px);
+  --display-2: clamp(56px, 6.5vw, 120px);
+  --h1: clamp(40px, 4.5vw, 72px);
+  --h2: clamp(32px, 3.5vw, 56px);
+  --h3: clamp(24px, 2.2vw, 36px);
+  --body-lg: clamp(16px, 1.1vw, 19px);
+  --body: 16px;
+  --small: 14px;
+  --micro: 12px;
+
+  /* Fonts */
+  --font-sans: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace;
+  --font-cn: 'Noto Sans SC', 'Inter', -apple-system, 'PingFang SC', sans-serif;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --t-fast: 0.3s;
+  --t-base: 0.6s;
+  --t-slow: 1.2s;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.5;
+  font-size: var(--body);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--bg-primary);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--text-faint);
+  border-radius: 0;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Typography helpers */
+.display {
+  font-family: var(--font-sans);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 0.95;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+.cn {
+  font-family: var(--font-cn);
+}
+
+/* Section base */
+.section {
+  position: relative;
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+@media (max-width: 1024px) {
+  .section {
+    padding: 0 var(--gutter-mobile);
+  }
+}
+
+/* Section eyebrow */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-mono);
+  font-size: var(--micro);
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 32px;
+}
+
+.eyebrow::before {
+  content: '';
+  display: inline-block;
+  width: 32px;
+  height: 1px;
+  background: var(--text-muted);
+}
+
+/* Button */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 28px;
+  font-family: var(--font-sans);
+  font-size: var(--small);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  border: 1px solid var(--border-medium);
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease-out);
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn:hover {
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  border-color: var(--text-primary);
+}
+
+.btn-primary {
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  border-color: var(--text-primary);
+}
+
+.btn-primary:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg-primary);
+}
+
+.btn .arrow {
+  transition: transform var(--t-fast) var(--ease-out);
+}
+
+.btn:hover .arrow {
+  transform: translateX(4px);
+}
+
+/* Link */
+.link-line {
+  position: relative;
+  display: inline-block;
+  color: var(--text-primary);
+  text-decoration: none;
+  padding-bottom: 2px;
+}
+
+.link-line::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  transform-origin: right;
+  transform: scaleX(1);
+  transition: transform var(--t-fast) var(--ease-out);
+}
+
+.link-line:hover::after {
+  transform-origin: left;
+  transform: scaleX(0);
+}
+
+/* Animations */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideRight {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes scrollDown {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  30% { opacity: 1; }
+  100% {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+}
+
+/* ===========================================
+   Reveal primitives (GSAP-driven)
+   .reveal-mask 包裹层：overflow hidden
+   .reveal-line 内层：被推动的行（初始由 GSAP set yPercent:110）
+   .reveal-clip 图片遮罩容器
+   =========================================== */
+.reveal-mask {
+  display: block;
+  overflow: hidden;
+  padding-block: 0.05em; /* 避免字母上下被切（g/曲线） */
+}
+
+.reveal-line {
+  display: block;
+  will-change: transform;
+}
+
+.reveal-clip {
+  position: relative;
+  overflow: hidden;
+}
+
+.reveal-clip > .media-inner {
+  will-change: transform;
+}
+
+/* 旧的 .reveal 类保留为占位（兼容未迁移元素） */
+.reveal {
+  opacity: 1;
+}
+
+/* Number tag */
+.num-tag {
+  font-family: var(--font-mono);
+  font-size: var(--micro);
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+}
