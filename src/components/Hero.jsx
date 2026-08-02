@@ -9,24 +9,62 @@ export default function Hero() {
 
   // 性能：首屏滚出视口 / 滚动进行中 时暂停视频与背景模糊动画，
   // 回屏且停手后自动恢复 —— 直接消除首屏滚动卡顿
+  // 同时：浏览器可能静默拦截 muted autoplay，这里加一次用户交互 fallback，
+  //       让用户首次点击/滚动/按键时再尝试播放一次
   useEffect(() => {
     const el = root.current
     const video = videoRef.current
-    if (!el) return
+    if (!el || !video) return
 
     let isVisible = true
     let scrollTimer = null
+    let gestureAttached = false
+
+    const tryPlay = () => {
+      const p = video.play()
+      if (p && typeof p.catch === 'function') {
+        p.catch(() => attachGestureFallback())
+      }
+    }
+
+    const onFirstGesture = () => {
+      // 用户首次交互后重试一次，成功就摘掉监听
+      const p = video.play()
+      if (p && typeof p.then === 'function') {
+        p.then(() => detachGestureFallback()).catch(() => {})
+      } else {
+        detachGestureFallback()
+      }
+    }
+
+    const attachGestureFallback = () => {
+      if (gestureAttached) return
+      gestureAttached = true
+      document.addEventListener('pointerdown', onFirstGesture, { passive: true })
+      document.addEventListener('keydown', onFirstGesture, { passive: true })
+      window.addEventListener('scroll', onFirstGesture, { passive: true })
+    }
+
+    const detachGestureFallback = () => {
+      if (!gestureAttached) return
+      gestureAttached = false
+      document.removeEventListener('pointerdown', onFirstGesture)
+      document.removeEventListener('keydown', onFirstGesture)
+      window.removeEventListener('scroll', onFirstGesture)
+    }
 
     // 是否应当播放：首屏可见 且 当前不在滚动中
     const sync = () => {
-      if (!video) return
-      const active = isVisible && !el.classList.contains('is-scrolling')
-      if (active) {
-        video.play().catch(() => {})
-      } else {
+      if (!isVisible || el.classList.contains('is-scrolling')) {
         video.pause()
+      } else {
+        tryPlay()
       }
     }
+
+    // 视频数据可用时主动再 play 一次（首帧之后立刻播，避开 poster 残留）
+    const onLoaded = () => sync()
+    video.addEventListener('loadeddata', onLoaded)
 
     const io = new IntersectionObserver(
       ([entry]) => {
@@ -53,6 +91,8 @@ export default function Hero() {
     return () => {
       io.disconnect()
       window.removeEventListener('scroll', onScroll)
+      video.removeEventListener('loadeddata', onLoaded)
+      detachGestureFallback()
       if (scrollTimer) clearTimeout(scrollTimer)
     }
   }, [])
@@ -136,7 +176,6 @@ export default function Hero() {
           ref={videoRef}
           className="hero__video"
           src="/videos/hero-bg.mp4"
-          poster="/videos/hero-bg-poster.svg"
           autoPlay
           muted
           loop
