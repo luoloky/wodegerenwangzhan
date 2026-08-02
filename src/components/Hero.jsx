@@ -62,9 +62,15 @@ export default function Hero() {
       }
     }
 
-    // 视频数据可用时主动再 play 一次（首帧之后立刻播，避开 poster 残留）
+    // 视频数据可用 / 缓冲足够时主动再 play 一次（避开 poster 残留）；
+    // canplay/canplaythrough 在缓冲到可播时触发，让首屏可见即播，不必等用户点击
     const onLoaded = () => sync()
+    const onReady = () => {
+      if (isVisible && !el.classList.contains('is-scrolling')) tryPlay()
+    }
     video.addEventListener('loadeddata', onLoaded)
+    video.addEventListener('canplay', onReady)
+    video.addEventListener('canplaythrough', onReady)
 
     const io = new IntersectionObserver(
       ([entry]) => {
@@ -92,6 +98,8 @@ export default function Hero() {
       io.disconnect()
       window.removeEventListener('scroll', onScroll)
       video.removeEventListener('loadeddata', onLoaded)
+      video.removeEventListener('canplay', onReady)
+      video.removeEventListener('canplaythrough', onReady)
       detachGestureFallback()
       if (scrollTimer) clearTimeout(scrollTimer)
     }
