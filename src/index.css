@@ -300,7 +300,8 @@ body {
 
 .reveal-line {
   display: block;
-  will-change: transform;
+  /* 不在 CSS 常驻 will-change：一次性 reveal 动画由 GSAP 驱动合成，
+     常驻 will-change 会让大量元素永远占用 GPU 显存，反而导致卡顿 */
 }
 
 .reveal-clip {
@@ -309,7 +310,7 @@ body {
 }
 
 .reveal-clip > .media-inner {
-  will-change: transform;
+  /* 位移动画由 GSAP 在动画期间自动合成，不常驻 will-change */
 }
 
 /* 旧的 .reveal 类保留为占位（兼容未迁移元素） */

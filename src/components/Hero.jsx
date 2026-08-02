@@ -1,10 +1,61 @@
-import { useRef } from 'react'
+import { useRef, useEffect } from 'react'
 import { resume } from '../data/resume'
 import { gsap, useGSAP, EASE, DURATION, STAGGER } from '../data/motion'
 import './Hero.css'
 
 export default function Hero() {
   const root = useRef(null)
+  const videoRef = useRef(null)
+
+  // 性能：首屏滚出视口 / 滚动进行中 时暂停视频与背景模糊动画，
+  // 回屏且停手后自动恢复 —— 直接消除首屏滚动卡顿
+  useEffect(() => {
+    const el = root.current
+    const video = videoRef.current
+    if (!el) return
+
+    let isVisible = true
+    let scrollTimer = null
+
+    // 是否应当播放：首屏可见 且 当前不在滚动中
+    const sync = () => {
+      if (!video) return
+      const active = isVisible && !el.classList.contains('is-scrolling')
+      if (active) {
+        video.play().catch(() => {})
+      } else {
+        video.pause()
+      }
+    }
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        isVisible = entry.isIntersecting && entry.intersectionRatio > 0.1
+        el.classList.toggle('is-offscreen', !isVisible)
+        sync()
+      },
+      { threshold: [0, 0.1, 0.5, 1] }
+    )
+    io.observe(el)
+
+    // 滚动期间挂起视频解码与模糊动画；停手 160ms 后恢复
+    const onScroll = () => {
+      el.classList.add('is-scrolling')
+      sync()
+      if (scrollTimer) clearTimeout(scrollTimer)
+      scrollTimer = setTimeout(() => {
+        el.classList.remove('is-scrolling')
+        sync()
+      }, 160)
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+
+    return () => {
+      io.disconnect()
+      window.removeEventListener('scroll', onScroll)
+      if (scrollTimer) clearTimeout(scrollTimer)
+    }
+  }, [])
 
   useGSAP(() => {
     // useGSAP 自带 context + cleanup
@@ -79,8 +130,21 @@ export default function Hero() {
 
   return (
     <section id="top" className="hero" ref={root}>
-      {/* 背景层：抽象暗色流动 */}
+      {/* 背景层：抽象暗色流动 + 视频 */}
       <div className="hero__bg" aria-hidden="true">
+        <video
+          ref={videoRef}
+          className="hero__video"
+          src="/videos/hero-bg.mp4"
+          poster="/videos/hero-bg-poster.svg"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          disablePictureInPicture
+          disableRemotePlayback
+        />
         <div className="hero__bg-aurora" />
         <div className="hero__bg-fog" />
         <div className="hero__bg-noise" />

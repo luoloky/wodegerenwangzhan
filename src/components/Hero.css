@@ -26,16 +26,18 @@
 }
 
 /* Aurora layer: emerald green + deep teal + charcoal flowing blobs */
+/* 性能关键：去掉 blur() 滤镜 —— 大半径模糊是滚动卡顿头号元凶。
+   改用本身就柔和的径向渐变模拟光晕，滚动时仅做轻量合成，不再每帧重绘模糊纹理 */
 .hero__bg-aurora {
   position: absolute;
-  inset: -25%;
+  inset: -10%;
   background:
-    radial-gradient(ellipse 60% 50% at 20% 80%, rgba(61, 220, 151, 0.28) 0%, transparent 55%),
-    radial-gradient(ellipse 70% 60% at 85% 75%, rgba(20, 70, 45, 0.35) 0%, transparent 55%),
-    radial-gradient(ellipse 50% 40% at 70% 15%, rgba(80, 80, 80, 0.18) 0%, transparent 50%),
-    radial-gradient(ellipse 80% 50% at 40% 30%, rgba(25, 55, 35, 0.25) 0%, transparent 55%);
-  filter: blur(72px) saturate(115%);
+    radial-gradient(ellipse 62% 52% at 18% 82%, rgba(61, 220, 151, 0.32) 0%, transparent 64%),
+    radial-gradient(ellipse 70% 60% at 86% 76%, rgba(20, 70, 45, 0.40) 0%, transparent 64%),
+    radial-gradient(ellipse 52% 42% at 70% 16%, rgba(80, 80, 80, 0.22) 0%, transparent 60%),
+    radial-gradient(ellipse 78% 50% at 40% 30%, rgba(25, 55, 35, 0.32) 0%, transparent 64%);
   animation: auroraDrift 40s ease-in-out infinite alternate;
+  will-change: transform; /* 独立合成层，transform 动画不再触发父层重绘 */
 }
 
 @keyframes auroraDrift {
@@ -45,9 +47,10 @@
 }
 
 /* Fog layer: horizontal streaks, slow lateral drift */
+/* 同样去重模糊：blur 由 44px 降到 18px，且元素尺寸收紧，滚动合成成本大幅降低 */
 .hero__bg-fog {
   position: absolute;
-  inset: -10%;
+  inset: 0;
   background:
     linear-gradient(
       105deg,
@@ -59,8 +62,9 @@
       rgba(61, 220, 151, 0.05) 88%,
       transparent 100%
     );
-  filter: blur(44px);
+  filter: blur(18px);
   animation: fogDrift 52s linear infinite;
+  will-change: transform;
 }
 
 @keyframes fogDrift {
@@ -89,6 +93,21 @@
   pointer-events: none;
 }
 
+/* 首屏滚出视口时（JS 加 .is-offscreen）暂停背景模糊动画，
+   回到首屏自动恢复 */
+.hero.is-offscreen .hero__bg-aurora,
+.hero.is-offscreen .hero__bg-fog {
+  animation-play-state: paused;
+}
+
+/* 滚动进行中（JS 加 .is-scrolling）暂停视频解码与背景模糊动画，
+   这是解决首屏滚动卡顿的关键：滚动期间 GPU 不再持续解码视频、
+   也不再重绘两层大半径模糊层，停手后自动恢复 */
+.hero.is-scrolling .hero__bg-aurora,
+.hero.is-scrolling .hero__bg-fog {
+  animation-play-state: paused;
+}
+
 /* Optional video element */
 .hero__video {
   position: absolute;
@@ -96,8 +115,14 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center 0%; /* 主体下移、横向居中，让首屏大标题英文落在视频画面内（Y 值越小主体越靠下，越大越靠上） */
   z-index: 0;
-  opacity: 0.6;
+  opacity: 0.55;
+  pointer-events: none;
+  /* 提升为独立合成层，避免与文字层互相重绘 */
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 /* Content — centered poster layout */
