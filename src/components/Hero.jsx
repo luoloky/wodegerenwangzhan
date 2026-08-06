@@ -66,6 +66,8 @@ export default function Hero() {
     // canplay/canplaythrough 在缓冲到可播时触发，让首屏可见即播，不必等用户点击
     const onLoaded = () => sync()
     const onReady = () => {
+      // 视频就绪后淡入（首屏先用 aurora 渐变兜底，避免黑屏/突兀）
+      video.classList.add('is-ready')
       if (isVisible && !el.classList.contains('is-scrolling')) tryPlay()
     }
     video.addEventListener('loadeddata', onLoaded)
@@ -105,6 +107,31 @@ export default function Hero() {
     }
   }, [])
 
+  // 懒加载视频：首屏渲染后、浏览器空闲时才加载，避免视频下载抢占首屏
+  // 带宽导致整体卡顿。首屏先用 aurora 渐变兜底，视频 canplay 后由 .is-ready 淡入铺满。
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video) return
+    let idleId = null
+    let timer = null
+    const loadVideo = () => {
+      const src = video.dataset.src
+      if (src && !video.getAttribute('src')) {
+        video.setAttribute('src', src)
+        video.load()
+      }
+    }
+    if ('requestIdleCallback' in window) {
+      idleId = window.requestIdleCallback(loadVideo, { timeout: 2000 })
+    } else {
+      timer = setTimeout(loadVideo, 1000)
+    }
+    return () => {
+      if (idleId && window.cancelIdleCallback) window.cancelIdleCallback(idleId)
+      if (timer) clearTimeout(timer)
+    }
+  }, [])
+
   useGSAP(() => {
     // useGSAP 自带 context + cleanup
     const tl = gsap.timeline({ defaults: { ease: EASE.smooth } })
@@ -135,11 +162,10 @@ export default function Hero() {
       }, 0.7)
 
     // === 超大英文标题强视觉进场 ===
-    // LUO：mask reveal + scale 压缩归位
-    tl.set('.hero__title-line', { yPercent: 130, scale: 1.12, transformOrigin: 'center bottom' }, 0.95)
+    // LUO：mask reveal（去掉 scale 分量，260px 大字做 scale 形变开销大）
+    tl.set('.hero__title-line', { yPercent: 130, transformOrigin: 'center bottom' }, 0.95)
       .to('.hero__title-line', {
         yPercent: 0,
-        scale: 1,
         duration: DURATION.hero,
         ease: EASE.smooth,
         stagger: STAGGER.slow,
@@ -168,12 +194,6 @@ export default function Hero() {
         stagger: STAGGER.fast,
         ease: EASE.primary,
       }, 2.1)
-
-    // 流光（仅 accent 行）
-    tl.call(() => {
-      const accent = root.current.querySelector('.hero__title-line--accent')
-      if (accent) accent.classList.add('shimmer-on')
-    }, [], 2.2)
   }, { scope: root })
 
   return (
@@ -183,12 +203,11 @@ export default function Hero() {
         <video
           ref={videoRef}
           className="hero__video"
-          src="/videos/hero-bg.mp4"
-          autoPlay
+          data-src="/videos/hero-bg.mp4"
           muted
           loop
           playsInline
-          preload="auto"
+          preload="none"
           disablePictureInPicture
           disableRemotePlayback
         />

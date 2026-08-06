@@ -16,13 +16,17 @@
 }
 
 /* Background composition — dark, fluid, poster-like */
+/* 性能关键：钉死在视口（fixed）。滚动时只有文字内容滑过，
+   视频/渐变/光晕等重型层不再随页面位移被整体重新合成，
+   这是首屏滚动卡顿的根本解法（后续区块均为不透明背景，会自然盖住本层） */
 .hero__bg {
-  position: absolute;
+  position: fixed;
   inset: 0;
   z-index: -1;
   background: #050505;
-  /* 整个背景块提升到单一合成层，滚动时由 GPU 处理，主线程零重绘 */
+  /* 提升到单一合成层，滚动时由 GPU 处理，主线程零重绘 */
   transform: translateZ(0);
+  will-change: transform;
 }
 
 /* Aurora layer: emerald green + deep teal + charcoal flowing blobs */
@@ -47,7 +51,8 @@
 }
 
 /* Fog layer: horizontal streaks, slow lateral drift */
-/* 同样去重模糊：blur 由 44px 降到 18px，且元素尺寸收紧，滚动合成成本大幅降低 */
+/* 性能关键：去掉 filter: blur(18px) —— 全屏模糊叠在动画层上，位移时不断重算模糊，
+   是滚动卡顿第二元凶。仅保留极轻的渐变漂移，观感几乎不变 */
 .hero__bg-fog {
   position: absolute;
   inset: 0;
@@ -62,7 +67,6 @@
       rgba(61, 220, 151, 0.05) 88%,
       transparent 100%
     );
-  filter: blur(18px);
   animation: fogDrift 52s linear infinite;
   will-change: transform;
 }
@@ -74,12 +78,13 @@
 }
 
 /* Noise overlay */
+/* 性能关键：去掉 mix-blend-mode —— 全屏混合模式在滚动时每帧都要把背景读回再合成，
+   是首屏滚动卡顿的头号元凶。改为普通低透明度叠加，几乎无损观感却零混合开销 */
 .hero__bg-noise {
   position: absolute;
   inset: 0;
   background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.45 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-  opacity: 0.05;
-  mix-blend-mode: overlay;
+  opacity: 0.04;
   pointer-events: none;
 }
 
@@ -117,12 +122,18 @@
   object-fit: cover;
   object-position: center 0%; /* 主体下移、横向居中，让首屏大标题英文落在视频画面内（Y 值越小主体越靠下，越大越靠上） */
   z-index: 0;
-  opacity: 0.55;
+  opacity: 0; /* 懒加载：首屏先用 aurora 渐变兜底，canplay 后 .is-ready 平滑淡入铺满 */
+  transition: opacity 0.9s ease;
   pointer-events: none;
-  /* 提升为独立合成层，避免与文字层互相重绘 */
-  will-change: transform;
+  /* 仅做透明度淡入，使用 opacity 合成层即可，避免无谓的 transform 层常驻占显存 */
+  will-change: opacity;
   transform: translateZ(0);
   backface-visibility: hidden;
+}
+
+/* 视频缓冲就绪后由 JS 加 .is-ready，平滑淡入到目标不透明度 */
+.hero__video.is-ready {
+  opacity: 0.55;
 }
 
 /* Content — centered poster layout */
@@ -228,7 +239,7 @@
   display: block;
   font-size: clamp(88px, 15vw, 260px);
   color: var(--text-primary);
-  will-change: transform;
+  /* 不常驻 will-change：动画期间由 GSAP 自动管理合成层，避免持久占显存 */
 }
 
 .hero__title-line--accent {
@@ -244,16 +255,6 @@
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-}
-
-/* shimmer 由 GSAP 在标题归位后激活 */
-.hero__title-line--accent.shimmer-on {
-  animation: shimmer 7s linear infinite;
-}
-
-@keyframes shimmer {
-  0% { background-position: 250% 0; }
-  100% { background-position: -250% 0; }
 }
 
 /* Chinese name tag */
