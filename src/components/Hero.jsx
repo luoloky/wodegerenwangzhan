@@ -107,31 +107,6 @@ export default function Hero() {
     }
   }, [])
 
-  // 懒加载视频：首屏渲染后、浏览器空闲时才加载，避免视频下载抢占首屏
-  // 带宽导致整体卡顿。首屏先用 aurora 渐变兜底，视频 canplay 后由 .is-ready 淡入铺满。
-  useEffect(() => {
-    const video = videoRef.current
-    if (!video) return
-    let idleId = null
-    let timer = null
-    const loadVideo = () => {
-      const src = video.dataset.src
-      if (src && !video.getAttribute('src')) {
-        video.setAttribute('src', src)
-        video.load()
-      }
-    }
-    if ('requestIdleCallback' in window) {
-      idleId = window.requestIdleCallback(loadVideo, { timeout: 2000 })
-    } else {
-      timer = setTimeout(loadVideo, 1000)
-    }
-    return () => {
-      if (idleId && window.cancelIdleCallback) window.cancelIdleCallback(idleId)
-      if (timer) clearTimeout(timer)
-    }
-  }, [])
-
   useGSAP(() => {
     // useGSAP 自带 context + cleanup
     const tl = gsap.timeline({ defaults: { ease: EASE.smooth } })
@@ -203,11 +178,12 @@ export default function Hero() {
         <video
           ref={videoRef}
           className="hero__video"
-          data-src="/videos/hero-bg.mp4"
+          src="/videos/hero-bg.mp4"
+          autoPlay
           muted
           loop
           playsInline
-          preload="none"
+          preload="auto"
           disablePictureInPicture
           disableRemotePlayback
         />

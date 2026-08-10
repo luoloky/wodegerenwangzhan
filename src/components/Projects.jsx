@@ -5,11 +5,13 @@ import ProjectCover from './ProjectCover'
 import './Projects.css'
 
 /**
- * 懒加载视频：默认不设置 src，仅当进入视口附近时才挂载 src。
- * 配合 preload="none"，首屏（及未滚动到项目详情前）零视频下载。
+ * 项目视频：进入视口附近（rootMargin 200px）才挂载 src，并开始预缓冲
+ * （preload="auto"）。这样用户滚到项目、尚未点播放时视频已在后台下载，
+ * 配合服务端 faststart（moov 在文件头），点击播放可立即开播，无需等待整文件。
  */
 function LazyVideo({ src, poster, label }) {
   const wrapRef = useRef(null)
+  const videoRef = useRef(null)
   const [inView, setInView] = useState(false)
 
   useEffect(() => {
@@ -30,16 +32,24 @@ function LazyVideo({ src, poster, label }) {
     return () => io.disconnect()
   }, [])
 
+  // 进入视口、src 挂上后主动触发加载，确保尽快缓冲到可播
+  useEffect(() => {
+    if (inView && videoRef.current) {
+      videoRef.current.load()
+    }
+  }, [inView])
+
   return (
     <div className="project__detail project__detail--video" ref={wrapRef}>
       <video
+        ref={videoRef}
         src={inView ? src : undefined}
         poster={poster}
         controls
         loop
         muted
         playsInline
-        preload="none"
+        preload="auto"
         aria-label={label}
       />
     </div>
