@@ -77,6 +77,7 @@ export const resume = {
       color: '#2a6e3f',
       cover: 'forest',
       coverImage: '/images/slxws-cover.jpg',
+      detailImage: '/images/slxws_02.jpg',
       detailVideo: '/videos/slxws-video.mp4', // 已压缩至 18MB（< Cloudflare 25MB 上限）
     },
     {

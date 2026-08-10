@@ -118,24 +118,42 @@ export default function Projects() {
       }
     )
 
-    // 每个封面：scale reveal（不做位移视差，避免容器 overflow 裁切导致图片被遮挡）
+    // 每个封面：reveal 进场
     const covers = root.current.querySelectorAll('.project__cover')
     covers.forEach((cover) => {
       const inner = cover.querySelector('.cover-inner') || cover.querySelector('svg') || cover.firstElementChild
+      const isImage = inner && inner.tagName === 'IMG'
 
-      // reveal：scale 从 1.12 归位，营造缩放进场
-      gsap.set(inner, { scale: 1.12, transformOrigin: 'center center' })
-      gsap.to(inner, {
-        scale: 1,
-        duration: DURATION.epic,
-        ease: EASE.primary,
-        scrollTrigger: {
-          trigger: cover,
-          start: 'top 82%',
-          once: true,
-          invalidateOnRefresh: true,
-        },
-      })
+      if (isImage) {
+        // 栅格 jpg 封面：绝不做 scale 缩放（会被放大模糊，且 lazy 图加载后
+        // ScrollTrigger 位置错位易卡在放大态）。改用纯透明度淡入，始终 scale:1 保持清晰。
+        gsap.set(inner, { opacity: 0 })
+        gsap.to(inner, {
+          opacity: 1,
+          duration: DURATION.epic,
+          ease: EASE.primary,
+          scrollTrigger: {
+            trigger: cover,
+            start: 'top 85%',
+            once: true,
+            invalidateOnRefresh: true,
+          },
+        })
+      } else {
+        // SVG 矢量封面：缩放无模糊，保留缩放进场
+        gsap.set(inner, { scale: 1.12, transformOrigin: 'center center' })
+        gsap.to(inner, {
+          scale: 1,
+          duration: DURATION.epic,
+          ease: EASE.primary,
+          scrollTrigger: {
+            trigger: cover,
+            start: 'top 82%',
+            once: true,
+            invalidateOnRefresh: true,
+          },
+        })
+      }
     })
 
     // view all
