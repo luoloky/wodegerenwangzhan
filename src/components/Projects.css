@@ -124,6 +124,17 @@
   }
 }
 
+/* 项目1（黎侯虎）有右侧 gallery，body 列需要更宽 */
+.project:nth-child(1) {
+  grid-template-columns: 80px 1fr 2fr;
+}
+
+@media (max-width: 1024px) {
+  .project:nth-child(1) {
+    grid-template-columns: 1fr;
+  }
+}
+
 .project__index {
   display: flex;
   flex-direction: column;
@@ -282,4 +293,57 @@
 .project__tag:hover {
   border-color: var(--text-primary);
   color: var(--text-primary);
+}
+
+/* ===========================================
+   Project detail gallery (right-side grid)
+   =========================================== */
+
+.project__body--gallery {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 32px;
+}
+
+.project__gallery {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-content: start;
+}
+
+.project__gallery-item {
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-tertiary);
+}
+
+.project__gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform var(--t-base) var(--ease-out);
+}
+
+.project__gallery-item:hover img {
+  transform: scale(1.05);
+}
+
+@media (max-width: 1024px) {
+  .project__body--gallery {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .project__gallery {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .project__gallery {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }

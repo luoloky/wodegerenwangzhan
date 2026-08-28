@@ -5,6 +5,16 @@ export default defineConfig({
   plugins: [react()],
   // 相对路径：构建产物可直接用 file:// 双击打开，不依赖服务器
   base: './',
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ['react', 'react-dom'],
+          gsap: ['gsap', '@gsap/react'],
+        },
+      },
+    },
+  },
   server: {
     host: '0.0.0.0',
     port: 5173,

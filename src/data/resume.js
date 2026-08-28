@@ -60,9 +60,15 @@ export const resume = {
       color: '#d0121b',
       // 封面：黎侯虎 logo 纹理
       cover: 'lihouhu',
-      coverImage: '/images/lihouhu-logo.jpg',
+      coverImage: '/images/lihouhu-poster-main.jpg',
       // 详情展示：完整品牌规划海报
       detailImage: '/images/lihouhu-poster.jpg',
+      detailGallery: [
+        '/images/lihouhu-gallery-01.jpg',
+        '/images/lihouhu-gallery-02.jpg',
+        '/images/lihouhu-gallery-03.jpg',
+        '/images/lihouhu-gallery-04.jpg',
+      ],
     },
     {
       id: 'forest',
@@ -78,7 +84,6 @@ export const resume = {
       cover: 'forest',
       coverImage: '/images/slxws-cover.jpg',
       detailImage: '/images/slxws_02.jpg',
-      detailVideo: '/videos/slxws-video.mp4', // 已压缩至 18MB（< Cloudflare 25MB 上限）
     },
     {
       id: 'ue5-terrain',

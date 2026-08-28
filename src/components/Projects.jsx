@@ -1,55 +1,26 @@
-import { useRef, useEffect, useState } from 'react'
+import { useRef } from 'react'
 import { resume } from '../data/resume'
 import { gsap, useGSAP, EASE, DURATION, STAGGER, START } from '../data/motion'
 import ProjectCover from './ProjectCover'
 import './Projects.css'
 
 /**
- * 项目视频：进入视口附近（rootMargin 200px）才挂载 src，并开始预缓冲
- * （preload="auto"）。这样用户滚到项目、尚未点播放时视频已在后台下载，
- * 配合服务端 faststart（moov 在文件头），点击播放可立即开播，无需等待整文件。
+ * 项目视频：真正的懒加载。
+ * preload="none" 且不在进入视口时主动 load() —— 浏览器只在用户点击播放控件时才下载视频，
+ * 配合服务端 faststart（moov 在文件头）可边下边播。
+ * 这样 19MB 的 slxws 视频绝不会在滚动到项目区时后台偷偷预下载、拖垮整页。
  */
 function LazyVideo({ src, poster, label }) {
-  const wrapRef = useRef(null)
-  const videoRef = useRef(null)
-  const [inView, setInView] = useState(false)
-
-  useEffect(() => {
-    const el = wrapRef.current
-    if (!el) return
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            setInView(true)
-            io.disconnect()
-          }
-        })
-      },
-      { rootMargin: '200px' }
-    )
-    io.observe(el)
-    return () => io.disconnect()
-  }, [])
-
-  // 进入视口、src 挂上后主动触发加载，确保尽快缓冲到可播
-  useEffect(() => {
-    if (inView && videoRef.current) {
-      videoRef.current.load()
-    }
-  }, [inView])
-
   return (
-    <div className="project__detail project__detail--video" ref={wrapRef}>
+    <div className="project__detail project__detail--video">
       <video
-        ref={videoRef}
-        src={inView ? src : undefined}
+        src={src}
         poster={poster}
         controls
         loop
         muted
         playsInline
-        preload="auto"
+        preload="none"
         aria-label={label}
       />
     </div>
@@ -212,43 +183,94 @@ export default function Projects() {
                 </div>
               </div>
 
-              <div className="project__body">
-                <div className="project__meta">
-                  <span className="mono project__category">{p.category}</span>
-                  <span className="mono project__period">{p.period}</span>
-                </div>
+              <div className={`project__body ${p.detailGallery ? 'project__body--gallery' : ''}`}>
+                {p.detailGallery ? (
+                  <>
+                    <div className="project__body-main">
+                      <div className="project__meta">
+                        <span className="mono project__category">{p.category}</span>
+                        <span className="mono project__period">{p.period}</span>
+                      </div>
 
-                <h3 className="project__title">{p.title}</h3>
+                      <h3 className="project__title">{p.title}</h3>
 
-                <div className="project__role-row">
-                  <span className="mono project__role-label">ROLE</span>
-                  <span className="project__role">{p.role}</span>
-                </div>
+                      <div className="project__role-row">
+                        <span className="mono project__role-label">ROLE</span>
+                        <span className="project__role">{p.role}</span>
+                      </div>
 
-                <p className="project__summary">{p.summary}</p>
+                      <p className="project__summary">{p.summary}</p>
 
-                {p.detailImage && (
-                  <div className="project__detail">
-                    <img src={p.detailImage} alt={`${p.title} 详情`} loading="lazy" />
-                  </div>
+                      {p.detailImage && (
+                        <div className="project__detail">
+                          <img src={p.detailImage} alt={`${p.title} 详情`} loading="lazy" />
+                        </div>
+                      )}
+
+                      {p.detailVideo && (
+                        <LazyVideo
+                          src={p.detailVideo}
+                          poster={p.coverImage}
+                          label={`${p.title} 实机漫游视频`}
+                        />
+                      )}
+
+                      <div className="project__tags">
+                        {p.tags.map((t, j) => (
+                          <span className="project__tag" key={j}>
+                            {t}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="project__gallery">
+                      {p.detailGallery.map((img, i) => (
+                        <div className="project__gallery-item" key={i}>
+                          <img src={img} alt={`${p.title} 应用展示 ${i + 1}`} loading="lazy" />
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="project__meta">
+                      <span className="mono project__category">{p.category}</span>
+                      <span className="mono project__period">{p.period}</span>
+                    </div>
+
+                    <h3 className="project__title">{p.title}</h3>
+
+                    <div className="project__role-row">
+                      <span className="mono project__role-label">ROLE</span>
+                      <span className="project__role">{p.role}</span>
+                    </div>
+
+                    <p className="project__summary">{p.summary}</p>
+
+                    {p.detailImage && (
+                      <div className="project__detail">
+                        <img src={p.detailImage} alt={`${p.title} 详情`} loading="lazy" />
+                      </div>
+                    )}
+
+                    {p.detailVideo && (
+                      <LazyVideo
+                        src={p.detailVideo}
+                        poster={p.coverImage}
+                        label={`${p.title} 实机漫游视频`}
+                      />
+                    )}
+
+                    <div className="project__tags">
+                      {p.tags.map((t, j) => (
+                        <span className="project__tag" key={j}>
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                  </>
                 )}
-
-                {p.detailVideo && (
-                  <LazyVideo
-                    src={p.detailVideo}
-                    poster={p.coverImage}
-                    label={`${p.title} 实机漫游视频`}
-                  />
-                )}
-
-                <div className="project__tags">
-                  {p.tags.map((t, j) => (
-                    <span className="project__tag" key={j}>
-                      {t}
-                    </span>
-                  ))}
-                </div>
-
               </div>
             </article>
           ))}
