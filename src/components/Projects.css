@@ -301,15 +301,17 @@
 
 .project__body--gallery {
   display: grid;
-  grid-template-columns: 1fr 280px;
-  gap: 32px;
+  grid-template-columns: 1fr 220px;
+  gap: 40px;
+  align-items: center;
 }
 
 .project__gallery {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  align-content: start;
+  gap: 8px;
+  max-width: 200px;
+  margin: 0 auto;
 }
 
 .project__gallery-item {
