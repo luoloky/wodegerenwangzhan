@@ -61,8 +61,12 @@ export const resume = {
       // 封面：黎侯虎 logo 纹理
       cover: 'lihouhu',
       coverImage: '/images/lihouhu-logo.jpg',
-      // 详情展示：完整品牌规划海报
-      detailImage: '/images/lihouhu-poster.jpg',
+      detailGallery: [
+        '/images/lihouhu-gallery-01.jpg',
+        '/images/lihouhu-gallery-02.jpg',
+        '/images/lihouhu-gallery-03.jpg',
+        '/images/lihouhu-gallery-04.jpg',
+      ],
     },
     {
       id: 'forest',
@@ -107,12 +111,7 @@ export const resume = {
       color: '#d0121b',
       cover: 'lihouhu',
       coverImage: '/images/lihouhu-ui-01.jpg',
-      detailGallery: [
-        '/images/lihouhu-gallery-01.jpg',
-        '/images/lihouhu-gallery-02.jpg',
-        '/images/lihouhu-gallery-03.jpg',
-        '/images/lihouhu-gallery-04.jpg',
-      ],
+      detailImage: '/images/lihouhu-ui-02.jpg',
     },
   ],
 
