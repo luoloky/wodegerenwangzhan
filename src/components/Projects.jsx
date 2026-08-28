@@ -176,101 +176,59 @@ export default function Projects() {
                 <span className="mono">/ 0{resume.projects.length}</span>
               </div>
 
-              {p.detailGallery ? (
-                <div className="project__gallery project__gallery--left">
-                  {p.detailGallery.map((img, i) => (
-                    <div className="project__gallery-item" key={i}>
-                      <img src={img} alt={`${p.title} 应用展示 ${i + 1}`} loading="lazy" />
-                    </div>
-                  ))}
+              <div className="project__cover">
+                <ProjectCover variant={p.cover} color={p.color} num={p.num} image={p.coverImage} />
+                <div className="project__cover-overlay">
+                  <span className="mono project__cover-year">{p.period}</span>
                 </div>
-              ) : (
-                <div className="project__cover">
-                  <ProjectCover variant={p.cover} color={p.color} num={p.num} image={p.coverImage} />
-                  <div className="project__cover-overlay">
-                    <span className="mono project__cover-year">{p.period}</span>
-                  </div>
-                </div>
-              )}
+              </div>
 
               <div className={`project__body ${p.detailGallery ? 'project__body--gallery' : ''}`}>
-                {p.detailGallery ? (
-                  <>
-                    <div className="project__meta">
-                      <span className="mono project__category">{p.category}</span>
-                      <span className="mono project__period">{p.period}</span>
-                    </div>
+                <>
+                  <div className="project__meta">
+                    <span className="mono project__category">{p.category}</span>
+                    <span className="mono project__period">{p.period}</span>
+                  </div>
 
-                    <h3 className="project__title">{p.title}</h3>
+                  <h3 className="project__title">{p.title}</h3>
 
-                    <div className="project__role-row">
-                      <span className="mono project__role-label">ROLE</span>
-                      <span className="project__role">{p.role}</span>
-                    </div>
+                  <div className="project__role-row">
+                    <span className="mono project__role-label">ROLE</span>
+                    <span className="project__role">{p.role}</span>
+                  </div>
 
-                    <p className="project__summary">{p.summary}</p>
+                  <p className="project__summary">{p.summary}</p>
 
-                    {p.detailImage && (
-                      <div className="project__detail">
-                        <img src={p.detailImage} alt={`${p.title} 详情`} loading="lazy" />
-                      </div>
-                    )}
-
-                    {p.detailVideo && (
-                      <LazyVideo
-                        src={p.detailVideo}
-                        poster={p.coverImage}
-                        label={`${p.title} 实机漫游视频`}
-                      />
-                    )}
-
-                    <div className="project__tags">
-                      {p.tags.map((t, j) => (
-                        <span className="project__tag" key={j}>
-                          {t}
-                        </span>
+                  {p.detailGallery ? (
+                    <div className="project__gallery">
+                      {p.detailGallery.map((img, i) => (
+                        <div className="project__gallery-item" key={i}>
+                          <img src={img} alt={`${p.title} 应用展示 ${i + 1}`} loading="lazy" />
+                        </div>
                       ))}
                     </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="project__meta">
-                      <span className="mono project__category">{p.category}</span>
-                      <span className="mono project__period">{p.period}</span>
+                  ) : p.detailImage ? (
+                    <div className="project__detail">
+                      <img src={p.detailImage} alt={`${p.title} 详情`} loading="lazy" />
                     </div>
+                  ) : null}
 
-                    <h3 className="project__title">{p.title}</h3>
+                  {p.detailVideo && (
+                    <LazyVideo
+                      src={p.detailVideo}
+                      poster={p.coverImage}
+                      label={`${p.title} 实机漫游视频`}
+                    />
+                  )}
 
-                    <div className="project__role-row">
-                      <span className="mono project__role-label">ROLE</span>
-                      <span className="project__role">{p.role}</span>
-                    </div>
-
-                    <p className="project__summary">{p.summary}</p>
-
-                    {p.detailImage && (
-                      <div className="project__detail">
-                        <img src={p.detailImage} alt={`${p.title} 详情`} loading="lazy" />
-                      </div>
-                    )}
-
-                    {p.detailVideo && (
-                      <LazyVideo
-                        src={p.detailVideo}
-                        poster={p.coverImage}
-                        label={`${p.title} 实机漫游视频`}
-                      />
-                    )}
-
-                    <div className="project__tags">
-                      {p.tags.map((t, j) => (
-                        <span className="project__tag" key={j}>
-                          {t}
-                        </span>
-                      ))}
-                    </div>
-                  </>
-                )}
+                  <div className="project__tags">
+                    {p.tags.map((t, j) => (
+                      <span className="project__tag" key={j}>
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                </>
               </div>
             </article>
           ))}

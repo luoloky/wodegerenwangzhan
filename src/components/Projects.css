@@ -124,9 +124,9 @@
   }
 }
 
-/* 项目1（黎侯虎）用左侧 gallery 替代大封面 */
-.project:nth-child(1) {
-  grid-template-columns: 80px 220px 1fr;
+/* 项目1（黎侯虎）body 内用 gallery 替代大详情图 */
+.project:nth-child(1) .project__body--gallery .project__gallery {
+  margin-top: 24px;
 }
 
 @media (max-width: 1024px) {
@@ -307,18 +307,12 @@
 
 .project__gallery {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-.project__gallery--left {
-  align-self: center;
-  max-width: 200px;
-  width: 100%;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
 }
 
 .project__gallery-item {
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 9 / 19;
   overflow: hidden;
   border: 1px solid var(--border-subtle);
   background: var(--bg-tertiary);
@@ -337,19 +331,13 @@
 }
 
 @media (max-width: 1024px) {
-  .project:nth-child(1) .project__gallery--left {
-    order: 2;
-    max-width: none;
+  .project__gallery {
     grid-template-columns: repeat(4, 1fr);
-  }
-
-  .project__body--gallery {
-    order: 3;
   }
 }
 
 @media (max-width: 768px) {
-  .project:nth-child(1) .project__gallery--left {
+  .project__gallery {
     grid-template-columns: repeat(2, 1fr);
   }
 }
