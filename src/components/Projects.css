@@ -124,9 +124,9 @@
   }
 }
 
-/* 项目1（黎侯虎）有右侧 gallery，body 列需要更宽 */
+/* 项目1（黎侯虎）用左侧 gallery 替代大封面 */
 .project:nth-child(1) {
-  grid-template-columns: 80px 1fr 2fr;
+  grid-template-columns: 80px 220px 1fr;
 }
 
 @media (max-width: 1024px) {
@@ -300,18 +300,21 @@
    =========================================== */
 
 .project__body--gallery {
-  display: grid;
-  grid-template-columns: 1fr 220px;
-  gap: 40px;
-  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .project__gallery {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
+}
+
+.project__gallery--left {
+  align-self: center;
   max-width: 200px;
-  margin: 0 auto;
+  width: 100%;
 }
 
 .project__gallery-item {
@@ -334,18 +337,19 @@
 }
 
 @media (max-width: 1024px) {
-  .project__body--gallery {
-    grid-template-columns: 1fr;
-    gap: 24px;
+  .project:nth-child(1) .project__gallery--left {
+    order: 2;
+    max-width: none;
+    grid-template-columns: repeat(4, 1fr);
   }
 
-  .project__gallery {
-    grid-template-columns: repeat(4, 1fr);
+  .project__body--gallery {
+    order: 3;
   }
 }
 
 @media (max-width: 768px) {
-  .project__gallery {
+  .project:nth-child(1) .project__gallery--left {
     grid-template-columns: repeat(2, 1fr);
   }
 }
