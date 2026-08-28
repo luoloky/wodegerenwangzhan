@@ -111,7 +111,12 @@ export const resume = {
       color: '#d0121b',
       cover: 'lihouhu',
       coverImage: '/images/lihouhu-ui-01.jpg',
-      detailImage: '/images/lihouhu-ui-02.jpg',
+      detailGallery: [
+        '/images/lihouhu-ui-gallery-01.jpg',
+        '/images/lihouhu-ui-gallery-02.jpg',
+        '/images/lihouhu-ui-gallery-03.jpg',
+        '/images/lihouhu-ui-gallery-04.jpg',
+      ],
     },
   ],
 
